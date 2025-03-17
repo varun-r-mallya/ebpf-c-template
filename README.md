@@ -11,10 +11,9 @@ A simplified eBPF project template based on libbpf-bootstrap, designed for large
 
 ## Setup
 
-1. Initialize git submodules:
+1. Clone 
 ```bash
-git submodule init
-git submodule update
+git clone git@github.com:varun-r-mallya/ebpf-c-template.git --recurse-submodules
 ```
 
 2. Generate vmlinux:
