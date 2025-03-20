@@ -17,7 +17,7 @@ ARCH ?= $(shell uname -m | sed 's/x86_64/x86/' \
 VMLINUX_DIR := ./vmlinux/vmlinux.h/include/$(ARCH)
 VMLINUX := $(VMLINUX_DIR)/vmlinux.h
 
-INCLUDES := -I./build -I$(LIBBPF_INCLUDES) -I$(LIBBPF_INCLUDES)/uapi -I$(VMLINUX_DIR) -I./src
+INCLUDES := -I./build -I$(LIBBPF_INCLUDES) -I$(LIBBPF_INCLUDES)/uapi -I$(VMLINUX_DIR) -I./src -I./build/bpf -I./build/libbpf
 CFLAGS := -g -Wall
 ALL_LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
 
@@ -40,6 +40,9 @@ all: $(VMLINUX) $(TARGET)
 build:
 	mkdir -p build/bpf
 
+run:
+	sudo ./build/bootstrap
+
 # Generate vmlinux.h if it doesn't exist
 $(VMLINUX):
 	@echo "Generating vmlinux.h for architecture $(ARCH)..."
@@ -52,7 +55,7 @@ $(LIBBPF_OBJ): | build
 
 # Build BPF code
 $(BPF_OBJS): build/bpf/%.bpf.o: src/bpf/%.bpf.c $(LIBBPF_OBJ) $(VMLINUX) | build
-	$(CLANG) -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) $(INCLUDES) -c $< -o $@
+	$(CLANG) -O2 -g -target bpf -Wall -D__TARGET_ARCH_$(ARCH) $(INCLUDES) -c $< -o $@
 
 # Generate BPF skeletons
 $(BPF_SKELS): build/bpf/%.skel.h: build/bpf/%.bpf.o | build
